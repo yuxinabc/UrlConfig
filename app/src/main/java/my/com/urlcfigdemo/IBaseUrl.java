@@ -1,6 +1,6 @@
 package my.com.urlcfigdemo;
 
-import com.yunjiglobal.annotations.UrlConfig;
+import com.cassInfo.annotations.UrlConfig;
 
 public class IBaseUrl {
     @UrlConfig("test")

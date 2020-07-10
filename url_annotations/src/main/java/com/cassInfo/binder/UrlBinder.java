@@ -1,9 +1,9 @@
-package com.yunjiglobal.binder;
+package com.cassInfo.binder;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class UrlBinderF {
+public class UrlBinder {
     public static void bind(Class clz, Map<String,String> map){
         String name = clz.getName();
         ClassLoader classLoader = clz.getClassLoader();

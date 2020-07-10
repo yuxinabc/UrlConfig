@@ -1,15 +1,16 @@
-package com.yunjiglobal.processor;
+package com.cassInfo.processor;
 
 import com.google.auto.common.MoreElements;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.yunjiglobal.annotations.UrlConfig;
+import com.cassInfo.annotations.UrlConfig;
+
+
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -31,11 +32,10 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.tools.Diagnostic;
 
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes("com.yunjiglobal.annotations.UrlConfig")
+@SupportedAnnotationTypes("com.cassInfo.annotations.UrlConfig")
 public class JavaUrlProcessor extends AbstractProcessor {
     private Elements elementUtils;
     private Types typeUtils;
@@ -63,6 +63,7 @@ public class JavaUrlProcessor extends AbstractProcessor {
         //创建方法
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("loadData").addModifiers(Modifier.STATIC).addParameter(parameterSpec);
         TypeElement enclosingElement = null;
+        methodBuilder.addCode("if(map!=null){");
         while (iterator.hasNext()) {
             //因为注解作用在属性上，强转成VariableElement
             VariableElement variableElement = (VariableElement) iterator.next();
@@ -72,13 +73,15 @@ public class JavaUrlProcessor extends AbstractProcessor {
             UrlConfig annotation = variableElement.getAnnotation(UrlConfig.class);
             String key = annotation.value();
             String filedName = variableElement.getSimpleName().toString();
-            methodBuilder.addStatement("IBaseUrl.$L=map.get($S)", filedName, key);
+            String packageName = getPackageName(enclosingElement);
+            String className = getClassName(enclosingElement, packageName);
+            methodBuilder.addStatement("$N.$L=map.get($S)", className,filedName, key);
         }
+        methodBuilder.addCode("}");
         if(enclosingElement!=null){
-            String packageName = MoreElements.getPackage(enclosingElement).getQualifiedName().toString();
+            String packageName = getPackageName(enclosingElement);
             //创建类
-            String className = enclosingElement.getQualifiedName().toString().substring(
-                    packageName.length() + 1).replace('.', '$');
+            String className = getClassName(enclosingElement, packageName);
             ClassName bindingClassName = ClassName.get(packageName, className + "_Binding");
             TypeSpec typeSpec = TypeSpec.classBuilder(bindingClassName).addMethod(methodBuilder.build()).build();
             //创建java文件
@@ -90,5 +93,16 @@ public class JavaUrlProcessor extends AbstractProcessor {
             }
         }
         return false;
+    }
+
+
+    private String getClassName(TypeElement enclosingElement, String packageName) {
+        return enclosingElement.getQualifiedName().toString().substring(
+                packageName.length() + 1).replace('.', '$');
+    }
+
+
+    private String getPackageName(TypeElement enclosingElement) {
+        return MoreElements.getPackage(enclosingElement).getQualifiedName().toString();
     }
 }
