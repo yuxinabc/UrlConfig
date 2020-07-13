@@ -17,6 +17,31 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    /* packagingOptions {
+         exclude 'META-INF/LGPL2.1'
+         exclude 'META-INF/LICENSE'
+         exclude 'META-INF/NOTICE'
+         exclude 'META-INF/LICENSE.txt'
+         exclude 'META-INF/NOTICE.txt'
+     }
+ //生成未混淆的Jar
+     def SDK_DEBUG_BASENAME = "urlConfig"//未混淆的jar名字
+     def SDK_OUTPATH = "libs/"//生成Jar的目录
+     task makeJar(type: Jar) {
+         delete SDK_OUTPATH+SDK_DEBUG_BASENAME+'.jar'//删除原来的jar
+         //包括子module额class文件
+         from('../url_annotations/build/classes/java')
+         from('../url_processor/build/classes/java')
+ //    //去掉不需要打包的目录和文件
+         exclude('BuildConfig.class', 'R.class')
+ ////    //去掉R$开头的文件
+         exclude { it.name.startsWith('R$'); }
+         baseName = SDK_DEBUG_BASENAME
+         //打进jar包后的文件目录
+         destinationDir = file(SDK_OUTPATH)
+     }
+
+     makeJar.dependsOn(build)*/
 }
 
 dependencies {
